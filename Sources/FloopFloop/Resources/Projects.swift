@@ -228,7 +228,10 @@ public struct Projects: Sendable {
     /// `.buildFailed` / `.buildCancelled` / `.timeout`.
     public func stream(_ ref: String, opts: StreamOptions = .init()) -> AsyncThrowingStream<StatusEvent, Error> {
         AsyncThrowingStream { continuation in
-            let task = Task {
+            // Explicit Task<Void, Never> — Swift 6 can't disambiguate the
+            // throwing vs non-throwing Task overloads when the closure body
+            // contains `try` calls but catches all of them locally.
+            let task = Task<Void, Never> {
                 do {
                     let deadline = Date().addingTimeInterval(opts.maxWait)
                     var lastKey: String? = nil
