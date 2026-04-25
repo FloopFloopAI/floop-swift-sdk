@@ -62,6 +62,8 @@ Grab an API key at [www.floopfloop.com/account/api-keys](https://www.floopfloop.
 
 Every method is `async throws`. Non-2xx responses throw `FloopError`.
 
+For longer end-to-end patterns — streaming a build, refining mid-deploy, attachment uploads, key rotation, retry-with-backoff — see the [cookbook](docs/recipes.md).
+
 ## Streaming a build
 
 ```swift
