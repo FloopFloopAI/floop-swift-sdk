@@ -227,51 +227,66 @@ public struct Projects: Sendable {
     /// On non-success terminals throws `FloopError` with code
     /// `.buildFailed` / `.buildCancelled` / `.timeout`.
     public func stream(_ ref: String, opts: StreamOptions = .init()) -> AsyncThrowingStream<StatusEvent, Error> {
-        AsyncThrowingStream { continuation in
-            // Explicit Task<Void, Never> — Swift 6 can't disambiguate the
-            // throwing vs non-throwing Task overloads when the closure body
-            // contains `try` calls but catches all of them locally.
-            let task = Task<Void, Never> {
-                do {
-                    let deadline = Date().addingTimeInterval(opts.maxWait)
-                    var lastKey: String? = nil
-                    while !Task.isCancelled {
-                        if Date() >= deadline {
-                            throw FloopError(
-                                code: .timeout,
-                                message: "stream: project \(ref) did not reach a terminal state within \(opts.maxWait)s"
-                            )
-                        }
-                        let event = try await self.status(ref)
-                        let key = "\(event.status)|\(event.step)|\(event.progress.map(String.init) ?? "")|\(event.queuePosition.map(String.init) ?? "")"
-                        if key != lastKey {
-                            lastKey = key
-                            continuation.yield(event)
-                        }
-                        switch event.status {
-                        case "live", "archived":
-                            continuation.finish()
-                            return
-                        case "failed":
-                            throw FloopError(
-                                code: .buildFailed,
-                                message: event.message.isEmpty ? "build failed" : event.message
-                            )
-                        case "cancelled":
-                            throw FloopError(
-                                code: .buildCancelled,
-                                message: event.message.isEmpty ? "build cancelled" : event.message
-                            )
-                        default:
-                            try await Task.sleep(nanoseconds: UInt64(opts.interval * 1_000_000_000))
-                        }
-                    }
-                    continuation.finish()
-                } catch {
-                    continuation.finish(throwing: error)
+        // Use the unambiguous factory rather than the closure-init form —
+        // Swift's type inference deadlocks on
+        // `AsyncThrowingStream { continuation in ... }` when the body
+        // contains `try await` calls and a Task wrapper. `makeStream()`
+        // hands back the typed continuation directly.
+        let (stream, continuation) = AsyncThrowingStream<StatusEvent, Error>.makeStream()
+
+        let task = Task<Void, Never> {
+            do {
+                try await self.runStream(ref: ref, opts: opts) { event in
+                    continuation.yield(event)
                 }
+                continuation.finish()
+            } catch {
+                continuation.finish(throwing: error)
             }
-            continuation.onTermination = { _ in task.cancel() }
+        }
+        continuation.onTermination = { _ in task.cancel() }
+        return stream
+    }
+
+    /// Polling loop body for `stream`. Factored out so the type-inference
+    /// surface inside `stream` stays trivial.
+    private func runStream(
+        ref: String,
+        opts: StreamOptions,
+        yield: (StatusEvent) -> Void
+    ) async throws {
+        let deadline = Date().addingTimeInterval(opts.maxWait)
+        var lastKey: String? = nil
+
+        while !Task.isCancelled {
+            if Date() >= deadline {
+                throw FloopError(
+                    code: .timeout,
+                    message: "stream: project \(ref) did not reach a terminal state within \(opts.maxWait)s"
+                )
+            }
+            let event = try await self.status(ref)
+            let key = "\(event.status)|\(event.step)|\(event.progress.map(String.init) ?? "")|\(event.queuePosition.map(String.init) ?? "")"
+            if key != lastKey {
+                lastKey = key
+                yield(event)
+            }
+            switch event.status {
+            case "live", "archived":
+                return
+            case "failed":
+                throw FloopError(
+                    code: .buildFailed,
+                    message: event.message.isEmpty ? "build failed" : event.message
+                )
+            case "cancelled":
+                throw FloopError(
+                    code: .buildCancelled,
+                    message: event.message.isEmpty ? "build cancelled" : event.message
+                )
+            default:
+                try await Task.sleep(nanoseconds: UInt64(opts.interval * 1_000_000_000))
+            }
         }
     }
 

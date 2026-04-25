@@ -4,10 +4,10 @@ import PackageDescription
 let package = Package(
     name: "FloopFloop",
     platforms: [
-        .macOS(.v12),
-        .iOS(.v15),
-        .tvOS(.v15),
-        .watchOS(.v8),
+        .macOS(.v14),
+        .iOS(.v17),
+        .tvOS(.v17),
+        .watchOS(.v10),
         .visionOS(.v1),
     ],
     products: [

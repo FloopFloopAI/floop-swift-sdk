@@ -2,7 +2,7 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/FloopFloopAI/floop-swift-sdk/ci.yml?branch=main&logo=github&label=ci)](https://github.com/FloopFloopAI/floop-swift-sdk/actions/workflows/ci.yml)
 [![Swift](https://img.shields.io/badge/swift-5.9%2B-orange?logo=swift&logoColor=white)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/platforms-iOS%2015%20%7C%20macOS%2012%20%7C%20tvOS%2015%20%7C%20watchOS%208%20%7C%20visionOS%201-blue)](Package.swift)
+[![Platforms](https://img.shields.io/badge/platforms-iOS%2017%20%7C%20macOS%2014%20%7C%20tvOS%2017%20%7C%20watchOS%2010%20%7C%20visionOS%201-blue)](Package.swift)
 [![License: MIT](https://img.shields.io/github/license/FloopFloopAI/floop-swift-sdk)](LICENSE)
 
 Official Swift SDK for the [FloopFloop](https://www.floopfloop.com) API. Build, refine, and manage FloopFloop projects from any Swift codebase — server-side or client-side.
@@ -26,7 +26,7 @@ targets: [
 
 Or via **Xcode**: File → Add Package Dependencies → paste `https://github.com/FloopFloopAI/floop-swift-sdk.git`.
 
-Requires Swift 5.9+ and one of: iOS 15+ / macOS 12+ / tvOS 15+ / watchOS 8+ / visionOS 1+. Zero runtime dependencies — uses `URLSession` and `Foundation` only.
+Requires Swift 5.9+ and one of: iOS 17+ / macOS 14+ / tvOS 17+ / watchOS 10+ / visionOS 1+. Zero runtime dependencies — uses `URLSession` and `Foundation` only.
 
 ## Quickstart
 
