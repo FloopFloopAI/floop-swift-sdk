@@ -80,7 +80,7 @@ final class TransportTests: XCTestCase {
     func testUnknownServerCodePassesThrough() async throws {
         StubURLProtocol.enqueueJSON(
             status: 418,
-            body: Data(#"{"error":{"code":"TEAPOT_MODE","message":"short and stout"}}"#.utf8)
+            #"{"error":{"code":"TEAPOT_MODE","message":"short and stout"}}"#
         )
         let client = makeStubbedClient()
         do {
