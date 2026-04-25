@@ -266,7 +266,9 @@ public struct Projects: Sendable {
                 )
             }
             let event = try await self.status(ref)
-            let key = "\(event.status)|\(event.step)|\(event.progress.map(String.init) ?? "")|\(event.queuePosition.map(String.init) ?? "")"
+            let progressStr = event.progress.map { String($0) } ?? ""
+            let queuePosStr = event.queuePosition.map { String($0) } ?? ""
+            let key = "\(event.status)|\(event.step)|\(progressStr)|\(queuePosStr)"
             if key != lastKey {
                 lastKey = key
                 yield(event)
