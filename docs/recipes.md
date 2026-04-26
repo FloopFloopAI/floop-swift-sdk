@@ -305,6 +305,31 @@ func example(client: FloopFloop) async throws {
 
 ---
 
+## 7. Make a small change without a full rebuild (`codeEditOnly`)
+
+Default `refine` runs the full 6-step pipeline — replan, regenerate, redeploy. For a copy edit, a colour swap, or a typo fix that doesn't need a redesign, set `codeEditOnly: true`. The backend cuts to a 3-step in-place patch and deducts the cheaper code-edit credit cost (roughly half a refinement).
+
+Only meaningful once the project has reached `live` at least once — on a project that hasn't deployed yet, the flag is ignored and you get a normal initial build.
+
+```swift
+import FloopFloop
+
+func tweakHeadline(client: FloopFloop, ref: String) async throws {
+    _ = try await client.projects.refine(
+        ref,
+        .init(
+            message: "Change the hero headline from 'Welcome' to 'Hello there.'",
+            codeEditOnly: true
+        )
+    )
+    _ = try await client.projects.waitForLive(ref)
+}
+```
+
+If the change actually needs a redesign or a new dependency, prefer a plain `refine` — `codeEditOnly` is for surface-level edits only. The backend won't promote a code-edit into a full refinement automatically; it just runs the 3-step patch with the limited tools it has, and you may end up paying for a second `refine` to redo the change properly.
+
+---
+
 ## Got a pattern worth adding?
 
 Open an issue at [floop-swift-sdk/issues](https://github.com/FloopFloopAI/floop-swift-sdk/issues) describing the use case. Recipes live in this file, not in `Sources/`, so they're easy to update without a release.
