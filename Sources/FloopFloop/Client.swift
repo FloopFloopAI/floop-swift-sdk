@@ -76,8 +76,9 @@ public final class FloopFloop: Sendable {
     public var subdomains: Subdomains { Subdomains(client: self) }
     public var secrets:    Secrets    { Secrets(client: self) }
     public var library:    Library    { Library(client: self) }
-    public var usage:      Usage      { Usage(client: self) }
-    public var apiKeys:    ApiKeys    { ApiKeys(client: self) }
+    public var usage:         Usage         { Usage(client: self) }
+    public var subscriptions: Subscriptions { Subscriptions(client: self) }
+    public var apiKeys:       ApiKeys       { ApiKeys(client: self) }
     public var uploads:    Uploads    { Uploads(client: self) }
     public var user:       UserAPI    { UserAPI(client: self) }
 }
