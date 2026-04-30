@@ -70,6 +70,8 @@ public enum FloopErrorCode: Sendable, Equatable {
     case timeout
     case buildFailed
     case buildCancelled
+    case insufficientCredits
+    case paymentFailed
     case unknown
     /// Any server code the SDK doesn't have a dedicated case for.
     case other(String)
@@ -89,6 +91,8 @@ public enum FloopErrorCode: Sendable, Equatable {
         case .timeout:             return "TIMEOUT"
         case .buildFailed:         return "BUILD_FAILED"
         case .buildCancelled:      return "BUILD_CANCELLED"
+        case .insufficientCredits: return "INSUFFICIENT_CREDITS"
+        case .paymentFailed:       return "PAYMENT_FAILED"
         case .unknown:             return "UNKNOWN"
         case .other(let s):        return s
         }
@@ -108,6 +112,8 @@ public enum FloopErrorCode: Sendable, Equatable {
         case "TIMEOUT":             return .timeout
         case "BUILD_FAILED":        return .buildFailed
         case "BUILD_CANCELLED":     return .buildCancelled
+        case "INSUFFICIENT_CREDITS": return .insufficientCredits
+        case "PAYMENT_FAILED":      return .paymentFailed
         case "UNKNOWN":             return .unknown
         default:                    return .other(wire)
         }
